@@ -14,7 +14,7 @@ A **flow** is a path through the skills. Most paths run along one **main flow**,
 
 The route most work travels. You have an idea and want it built.
 
-1. **`/grill-with-docs`** — sharpen the idea by interview. Start here when you **have a codebase**: it's stateful, retaining what it learns in `CONTEXT.md` and ADRs. (No codebase? Use `/grill-me` — see Standalone. Both run the same `/grilling` primitive; `grill-with-docs` is the one that leaves a paper trail.)
+1. **`/grill-with-docs`** — discuss the idea in question rounds. Start here when you **have a codebase**: after each answered round it updates agreed terms in `CONTEXT.md` and significant decisions in ADRs. (No codebase? Use `/grill-me` — see Standalone. Both run the same `/grilling` primitive; `grill-with-docs` is the one that leaves a paper trail.)
 2. **Branch — can you settle every question in conversation?** If a question needs a runnable answer (state, business logic, a UI you have to see), detour through a prototype, bridged by **`/handoff`** in both directions (see Crossing sessions):
    - **`/handoff`** out, then open a fresh session against that file,
    - **`/prototype`** to answer the question with throwaway code,
@@ -49,14 +49,14 @@ A starting situation that generates work, then merges onto the main flow.
 
 Not feature work — upkeep.
 
-- **`/improve-codebase-architecture`** — run whenever you have a spare moment to keep the codebase good for agents to operate in. It surfaces **deepening opportunities**; picking one _generates an idea_ you can take into the main flow at `/grill-with-docs`. It's the survey that finds the candidates; **`/codebase-design`** (below) is the bench you design the chosen one on.
+- **`/improve-codebase-architecture`** — inspect a concrete part of the codebase and explain worthwhile changes. Its report distinguishes deployed behavior, repository code, local tests, and proposals. Discuss the chosen change in question rounds and update its documents, using `/grilling` and `/domain-modeling` together. `/grill-with-docs` also starts that discussion directly. Existing choices carry forward.
 
-## Vocabulary underneath
+## Design and terminology
 
-Two model-invoked references that run *beneath* the other skills — each the single source of truth for its vocabulary. Reach for them directly when the **words**, not the process, are the problem; or let the skills above pull them in.
+Two references help the other skills and can also be used directly. Their job is to make the work clearer, not to prescribe the words in every explanation.
 
-- **`/domain-modeling`** — sharpen the project's *domain* language: challenge a fuzzy term, resolve an overloaded word ("account" doing three jobs), record a hard-to-reverse decision as an ADR. It's the active discipline `/grill-with-docs` drives to keep `CONTEXT.md` a clean glossary.
-- **`/codebase-design`** — the deep-module vocabulary (module, interface, depth, seam, adapter, leverage, locality) for designing a module's *shape*: a lot of behaviour behind a small interface at a clean seam. `/tdd` and `/improve-codebase-architecture` both speak it.
+- **`/domain-modeling`** — resolve genuinely ambiguous terms, keep the user's clear wording, and save agreed meanings in `CONTEXT.md`. Record significant choices and their reasons in ADRs. During `/grill-with-docs`, update the documents after each answered round.
+- **`/codebase-design`** — design code that gives callers less to coordinate and maintainers fewer places to edit. Explain the actual responsibility, interface, tradeoff, and tests in ordinary English.
 
 ## Crossing sessions
 

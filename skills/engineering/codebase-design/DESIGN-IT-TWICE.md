@@ -1,44 +1,22 @@
-# Design It Twice
+# Compare designs when the choice matters
 
-When the user wants to explore alternative interfaces for a chosen deepening candidate, use this parallel sub-agent pattern. Based on "Design It Twice" (Ousterhout) — your first idea is unlikely to be the best.
+Use this when the user asks for alternatives or the choice has a meaningful cost. Do not manufacture several designs for a straightforward fix.
 
-Uses the vocabulary in [SKILL.md](SKILL.md) — **module**, **interface**, **seam**, **adapter**, **leverage**.
+## Set up the comparison
 
-## Process
+State the current behavior, the requested behavior, and the constraints. Separate deployed facts from experiments and assumptions.
 
-### 1. Frame the problem space
+Compare a small number of genuinely different approaches. Give each a realistic caller example, the files or processes it changes, the work it removes from callers, and its costs.
 
-Before spawning sub-agents, write a user-facing explanation of the problem space for the chosen candidate:
+Independent agents can help with substantial alternatives when delegation is authorized and useful. Do not require a fixed number of agents or invent extra alternatives to fill slots.
 
-- The constraints any new interface would need to satisfy
-- The dependencies it would rely on, and which category they fall into (see [DEEPENING.md](DEEPENING.md))
-- A rough illustrative code sketch to ground the constraints — not a proposal, just a way to make the constraints concrete
+## Present the result
 
-Show this to the user, then immediately proceed to Step 2. The user reads and thinks while the sub-agents work in parallel.
+Use plain names for the choices. Explain:
+- What using it looks like.
+- What runs where.
+- What configuration or upkeep it adds.
+- What can fail and how that is handled.
+- How it would be tested.
 
-### 2. Spawn sub-agents
-
-Spawn 3+ sub-agents in parallel using the Agent tool. Each must produce a **radically different** interface for the deepened module.
-
-Prompt each sub-agent with a separate technical brief (file paths, coupling details, dependency category from [DEEPENING.md](DEEPENING.md), what sits behind the seam). The brief is independent of the user-facing problem-space explanation in Step 1. Give each agent a different design constraint:
-
-- Agent 1: "Minimize the interface — aim for 1–3 entry points max. Maximise leverage per entry point."
-- Agent 2: "Maximise flexibility — support many use cases and extension."
-- Agent 3: "Optimise for the most common caller — make the default case trivial."
-- Agent 4 (if applicable): "Design around ports & adapters for cross-seam dependencies."
-
-Include both [SKILL.md](SKILL.md) vocabulary and CONTEXT.md vocabulary in the brief so each sub-agent names things consistently with the architecture language and the project's domain language.
-
-Each sub-agent outputs:
-
-1. Interface (types, methods, params — plus invariants, ordering, error modes)
-2. Usage example showing how callers use it
-3. What the implementation hides behind the seam
-4. Dependency strategy and adapters (see [DEEPENING.md](DEEPENING.md))
-5. Trade-offs — where leverage is high, where it's thin
-
-### 3. Present and compare
-
-Present designs sequentially so the user can absorb each one, then compare them in prose. Contrast by **depth** (leverage at the interface), **locality** (where change concentrates), and **seam placement**.
-
-After comparing, give your own recommendation: which design you think is strongest and why. If elements from different designs would combine well, propose a hybrid. Be opinionated — the user wants a strong read, not a menu.
+Recommend one approach and explain why it fits the user's priorities. Ask only about unresolved choices that materially affect the result. Continue an already-authorized implementation when those choices are settled.

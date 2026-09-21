@@ -1,71 +1,60 @@
 ---
 name: improve-codebase-architecture
-description: Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick.
+description: Review a codebase for concrete design problems and explain worthwhile changes with an accurate visual report.
 disable-model-invocation: true
 ---
 
 # Improve Codebase Architecture
 
-Surface architectural friction and propose **deepening opportunities** — refactors that turn shallow modules into deep ones. The aim is testability and AI-navigability.
+Find changes that make a real behavior easier to understand, use, change, or test. Explain the changes in ordinary English.
 
-This command is _informed_ by the project's domain model and built on a shared design vocabulary:
+## Scope and evidence
 
-- Run the `/codebase-design` skill for the architecture vocabulary (**module**, **interface**, **depth**, **seam**, **adapter**, **leverage**, **locality**) and its principles (the deletion test, "the interface is the test surface", "one adapter = hypothetical seam, two = real"). Use these terms exactly in every suggestion — don't drift into "component," "service," "API," or "boundary."
-- The domain language in `CONTEXT.md` gives names to good seams; ADRs in `docs/adr/` record decisions this command should not re-litigate.
+Use the area the user names. Otherwise inspect recent changes and relevant code to choose a useful scope. Read applicable instructions, the project's glossary, and relevant recorded decisions. If a proposal conflicts with an accepted ADR, identify the conflict and explain why revisiting the decision may be justified; do not silently override it.
 
-## Process
+Use codebase-design for design checks when available. Its technical vocabulary is not a required vocabulary for the report.
 
-### 1. Explore
+Establish the current state before drawing it:
+- Repository code shows what is implemented in that checkout.
+- A local experiment shows only what that experiment did.
+- Deployed behavior needs runtime or deployment evidence.
+- Proposed changes belong only in the proposed picture.
 
-**Scope before you scan — YAGNI.** Deepening a module pays off by making future changes to it easier, so put extra weight on the parts of the codebase that have recently changed. Decide *where* to look before you look:
+When the user asks about a deployed system, use that system as the baseline. Never substitute a local prototype for it. If an experiment is relevant, label it separately with where it ran. If evidence is unavailable, state that instead of filling in the picture.
 
-- If the user named a direction — a module, a subsystem, a pain point — take it, and skip the inference below.
-- Otherwise, walk back a good stretch of the commit history (`git log --oneline`) to find the codebase's hot spots — the files and areas that keep coming up — and let those paths pull your attention first. If the changes are scattered with no clear hot spot, widen the net.
+A second agent may inspect a substantial, independent part when delegation is authorized and useful. A review does not require delegation.
 
-Read the project's domain glossary (`CONTEXT.md`) and any ADRs in the area you're touching first.
+## Choose useful changes
 
-Then use the Agent tool with `subagent_type=Explore` to walk the codebase. Don't follow rigid heuristics — explore organically and note where you experience friction:
+Trace concrete operations and look for repeated coordination, confusing responsibility, unnecessary configuration, or tests that miss actual failures.
 
-- Where does understanding one concept require bouncing between many small modules?
-- Where are modules **shallow** — interface nearly as complex as the implementation?
-- Where have pure functions been extracted just for testability, but the real bugs hide in how they're called (no **locality**)?
-- Where do tightly-coupled modules leak across their seams?
-- Which parts of the codebase are untested, or hard to test through their current interface?
+For each candidate, identify:
+- The current behavior and supporting files or runtime evidence.
+- The specific problem.
+- What would change.
+- A concrete benefit and its cost.
+- How the change would be checked.
 
-Apply the **deletion test** to anything you suspect is shallow: would deleting it concentrate complexity, or just move it? A "yes, concentrates" is the signal you want.
+Ask what would happen if a suspected abstraction were removed: does its work disappear, or must callers repeat it? Use this to assess the design, not as a slogan in the report.
 
-### 2. Present candidates as an HTML report
+Present only candidates supported by evidence. A single useful change is enough. If the requested capability does not exist, say that adding it is new implementation work rather than inventing existing design defects.
 
-Write a self-contained HTML file to the OS temp directory so nothing lands in the repo. Resolve the temp dir from `$TMPDIR`, falling back to `/tmp` (or `%TEMP%` on Windows), and write to `<tmpdir>/architecture-review-<timestamp>.html` so each run gets a fresh file. Open it for the user — `xdg-open <path>` on Linux, `open <path>` on macOS, `start <path>` on Windows — and tell them the absolute path.
+## Present the review
 
-The report uses **Tailwind via CDN** for layout and styling, and **Mermaid via CDN** for diagrams where a graph/flow/sequence reliably communicates the structure. Mix Mermaid with hand-crafted CSS/SVG visuals — use Mermaid when relationships are graph-shaped (call graphs, dependencies, sequences), and hand-built divs/SVG when you want something more editorial (mass diagrams, cross-sections, collapse animations). Each candidate gets a **before/after visualisation**. Be visual.
+When a visual report helps, use [HTML-REPORT.md](HTML-REPORT.md). If the user requests another format, use it.
 
-For each candidate, render a card with:
+Use the user's words and familiar technical names. Titles should describe an action, such as "Add camouflage in front of frps." Explain benefits with concrete consequences, not labels such as "leverage", "locality", or "invariants".
 
-- **Files** — which files/modules are involved
-- **Problem** — why the current architecture is causing friction
-- **Solution** — plain English description of what would change
-- **Benefits** — explained in terms of locality and leverage, and how tests would improve
-- **Before / After diagram** — side-by-side, custom-drawn, illustrating the shallowness and the deepening
-- **Recommendation strength** — one of `Strong`, `Worth exploring`, `Speculative`, rendered as a badge
+Clearly label current state, local tests, and proposals in both prose and diagrams. Say whether anything was changed or deployed.
 
-End the report with a **Top recommendation** section: which candidate you'd tackle first and why.
+## Discuss the chosen change in rounds
 
-**Use CONTEXT.md vocabulary for the domain, and the `/codebase-design` vocabulary for the architecture.** If `CONTEXT.md` defines "Order," talk about "the Order intake module" — not "the FooBarHandler," and not "the Order service."
+For an exploratory review with several meaningful choices, recommend one and ask which the user wants to explore. If the user already chose an area, use it; do not ask them to choose it again.
 
-**ADR conflicts**: if a candidate contradicts an existing ADR, only surface it when the friction is real enough to warrant revisiting the ADR. Mark it clearly in the card (e.g. a warning callout: _"contradicts ADR-0007 — but worth reopening because…"_). Don't list every theoretical refactor an ADR forbids.
+Once a change is chosen, use the /grilling and /domain-modeling skills together: ask questions in rounds and update the documents as answers settle the design. The user can also start this workflow directly with /grill-with-docs.
 
-See [HTML-REPORT.md](HTML-REPORT.md) for the full HTML scaffold, diagram patterns, and styling guidance.
+In each round, ask the questions that can be answered independently with what is already known. Give a recommendation and explain its tradeoff. Wait for the answers before asking questions that depend on them. Look up facts yourself. Carry forward decisions already made; do not restart a completed discussion or turn wording corrections into a new interview.
 
-Do NOT propose interfaces yet. After the file is written, ask the user: "Which of these would you like to explore?"
+After each answered round, update agreed terms in CONTEXT.md and record significant decisions as ADRs. Keep unresolved choices visible in the design notes. Use plain language in both questions and documents. A proposal must not become an accepted ADR without an actual decision.
 
-### 3. Grilling loop
-
-Once the user picks a candidate, run the `/grilling` skill to walk the decision tree with them — constraints, dependencies, the shape of the deepened module, what sits behind the seam, what tests survive.
-
-Side effects happen inline as decisions crystallize — run the `/domain-modeling` skill to keep the domain model current as you go:
-
-- **Naming a deepened module after a concept not in `CONTEXT.md`?** Add the term to `CONTEXT.md`. Create the file lazily if it doesn't exist.
-- **Sharpening a fuzzy term during the conversation?** Update `CONTEXT.md` right there.
-- **User rejects the candidate with a load-bearing reason?** Offer an ADR, framed as: _"Want me to record this as an ADR so future architecture reviews don't re-suggest it?"_ Only offer when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing — skip ephemeral reasons ("not worth it right now") and self-evident ones.
-- **Want to explore alternative interfaces for the deepened module?** Run the `/codebase-design` skill and use its design-it-twice parallel sub-agent pattern.
+Finish when the important decisions are settled and the user confirms the design, then continue with implementation already authorized by the request. If the user explicitly asks to skip the interview, follow that instruction.

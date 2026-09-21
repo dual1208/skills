@@ -1,74 +1,38 @@
 ---
 name: domain-modeling
-description: Build and sharpen a project's domain model. Use when the user wants to pin down domain terminology or a ubiquitous language, record an architectural decision, or when another skill needs to maintain the domain model.
+description: Clarify project terminology and record agreed meanings or consequential design decisions. Use when discussing ambiguous terms or editing CONTEXT.md or an ADR.
 ---
 
 # Domain Modeling
 
-Actively build and sharpen the project's domain model as you design. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
+Help people use the same words for the same things. The goal is less confusion, not a larger vocabulary.
 
-## File structure
+## Use the user's language
 
-Most repos have a single context:
+Start with words the user and project already use. Keep a familiar term if it describes the concept accurately. Introduce a new term only when an actual distinction would otherwise remain confusing, and explain that distinction with a concrete example.
 
-```
-/
-├── CONTEXT.md
-├── docs/
-│   └── adr/
-│       ├── 0001-event-sourced-orders.md
-│       └── 0002-postgres-for-write-model.md
-└── src/
-```
+When the user corrects a term, use the correction and update the glossary. An assistant-written glossary does not overrule the user. For example, if the user calls ordinary website behavior "camouflage", do not rename it "cover" without a necessary distinction.
 
-If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives:
+Ask for clarification when a word has materially different meanings and context does not resolve them. Do not turn ordinary wording into a terminology interview. When a meaning or relationship remains ambiguous, try a concrete example or edge case to expose the difference before proposing new terms.
 
-```
-/
-├── CONTEXT-MAP.md
-├── docs/
-│   └── adr/                          ← system-wide decisions
-├── src/
-│   ├── ordering/
-│   │   ├── CONTEXT.md
-│   │   └── docs/adr/                 ← context-specific decisions
-│   └── billing/
-│       ├── CONTEXT.md
-│       └── docs/adr/
-```
+## Check facts separately
 
-Create files lazily — only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
+Use code and deployment evidence to check how the system behaves. Distinguish current implementation, running deployment, local experiments, and proposals. If the glossary and evidence disagree, explain the actual difference; do not assume the user is wrong because a document says otherwise.
 
-## During the session
+## Maintain the glossary
 
-### Challenge against the glossary
+Use the relevant CONTEXT.md, following an existing CONTEXT-MAP.md if the project has one. Create a glossary only when there is a useful agreed term to record.
 
-When the user uses a term that conflicts with the existing language in `CONTEXT.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y — which is it?"
+Keep entries short: the term and its meaning, with a concrete example when helpful. Record rejected synonyms only when they caused real confusion. Keep deployment status, detailed design plans, and implementation notes in their appropriate documents.
 
-### Sharpen fuzzy language
+Use [CONTEXT-FORMAT.md](CONTEXT-FORMAT.md) when writing entries.
 
-When the user uses vague or overloaded terms, propose a precise canonical term. "You're saying 'account' — do you mean the Customer or the User? Those are different things."
+## Keep documents current during question rounds
 
-### Discuss concrete scenarios
+When used with grilling or grill-with-docs, update documents after each answered round. Record agreed meanings in CONTEXT.md and significant decisions in ADRs while their reasons are fresh. Put open choices and assumptions in design notes, clearly marked as unresolved. Do not wait until the end of the whole interview to save what has been settled.
 
-When domain relationships are being discussed, stress-test them with specific scenarios. Invent scenarios that probe edge cases and force the user to be precise about the boundaries between concepts.
+## Record significant decisions
 
-### Cross-reference with code
+An architecture decision record (ADR) preserves what was chosen, why, and the tradeoff. Use one when the choice is costly to reverse, would surprise a future reader without context, and involved real alternatives. Keep it as short as the decision allows.
 
-When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?"
-
-### Update CONTEXT.md inline
-
-When a term is resolved, update `CONTEXT.md` right there. Don't batch these up — capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
-
-`CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
-
-### Offer ADRs sparingly
-
-Only offer to create an ADR when all three are true:
-
-1. **Hard to reverse** — the cost of changing your mind later is meaningful
-2. **Surprising without context** — a future reader will wonder "why did they do it this way?"
-3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons
-
-If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
+Do not record a proposal as an accepted decision or create a record for a routine wording correction. Use [ADR-FORMAT.md](ADR-FORMAT.md) when a decision record is warranted.

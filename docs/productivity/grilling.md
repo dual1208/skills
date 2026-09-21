@@ -1,37 +1,31 @@
 Quickstart:
 
 ```bash
-npx skills add mattpocock/skills --skill=grilling
+npx skills add dual1208/skills --skill=grilling
 ```
 
 ```bash
 npx skills update grilling
 ```
 
-[Source](https://github.com/mattpocock/skills/tree/main/skills/productivity/grilling)
+[Source](https://github.com/dual1208/skills/tree/main/skills/productivity/grilling)
 
 ## What it does
 
-`grilling` is the relentless interview that stress-tests a plan or design before you build it. It walks down the decision tree branch by branch, resolving the dependencies between decisions one at a time until you and the agent share the same understanding.
+Stress-tests a plan through question rounds. Each round asks the independent questions that can be answered now and gives a recommendation for each. It waits for your answers before asking questions that depend on them.
 
-It asks **one question at a time** and waits for your answer before the next — never a bulk list, which is bewildering. Each question comes with the agent's own recommended answer, and any question the codebase can settle it explores instead of asking you. It won't start enacting the plan until you confirm the shared understanding has been reached.
+The agent looks up facts available in the code, tools, documentation, or running system. It asks you about choices and preferences, rather than asking you to do its research.
 
 ## When to reach for it
 
-Type `/grilling`, or the agent reaches for it automatically when a task fits — this is the underlying primitive, not a user-only entry point.
+Type `/grilling`, or the agent uses it when you ask to grill an idea, challenge assumptions, or work through design decisions. Use [grill-with-docs](https://github.com/dual1208/skills/tree/main/skills/engineering/grill-with-docs) when the discussion should also update a project glossary and ADRs.
 
-Reach for it when a plan or design still has soft spots and you want them surfaced before code is written. In practice you usually invoke it through one of its two wrappers rather than by name: for a plain grilling session use [grill-me](https://aihero.dev/skills-grill-me); to have the session also write ADRs and a glossary as it goes, use [grill-with-docs](https://aihero.dev/skills-grill-with-docs).
+## How rounds work
 
-## The decision tree
+If two decisions can be made independently, they belong in the same round. If the second depends on the first answer, it waits. Your replies change which questions need asking next. A settled decision is not asked again unless new evidence changes the tradeoff.
 
-The mental model is a **decision tree**: every plan branches into decisions, and decisions depend on each other. `grilling` descends that tree one node at a time, so an early answer can reshape which questions come next. That is why the questions arrive singly and in dependency order — a firehose of parallel questions loses the structure that makes the interview converge on a shared understanding.
-
-## Pulled out on purpose
-
-`grilling` is the **single source of truth** for the interview technique, split out as a model-invoked **primitive** so every skill that needs an interview can reach it instead of reinventing one. [grill-me](https://aihero.dev/skills-grill-me) and [grill-with-docs](https://aihero.dev/skills-grill-with-docs) are its two user-invoked front doors, but [improve-codebase-architecture](https://aihero.dev/skills-improve-codebase-architecture) and [triage](https://aihero.dev/skills-triage) also lean on it to pressure-test their own decisions.
-
-Keeping the technique in one place means you can also reach for it directly when you just want the interview — without the ADR-writing or ticket-shaping that its wrappers add on top.
+The discussion ends when the important decisions are settled and you confirm the shared understanding. The agent does not silently treat an unanswered question as agreement.
 
 ## Where it fits
 
-`grilling` is the interview **primitive** under the main build chain: [grill-with-docs](https://aihero.dev/skills-grill-with-docs) runs it to sharpen context before [to-spec](https://aihero.dev/skills-to-spec) writes the spec. When you're unsure which entry point fits, [ask-matt](https://aihero.dev/skills-ask-matt) routes you.
+This is the question workflow used by [grill-with-docs](https://github.com/dual1208/skills/tree/main/skills/engineering/grill-with-docs) and [grill-me](https://github.com/dual1208/skills/tree/main/skills/productivity/grill-me). [Ask-matt](https://github.com/dual1208/skills/tree/main/skills/engineering/ask-matt) helps choose among the other workflows.
